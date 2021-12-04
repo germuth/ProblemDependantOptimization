@@ -6,8 +6,9 @@
 */
 
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
+#include <cmath>
 #include "cover.h"
 #include "arg.h"
 #include "tables.h"
@@ -103,10 +104,10 @@ void parseArguments(int argc, char **argv)
     if((tmp = strchr(argv[i], '=')) == NULL)
       errmsg(argv[i]);
     eq = tmp - argv[i] + 1;
-    strncpy(name, argv[i], min(eq - 1, TMP_BUF_SIZE - 1));
-    name[min(eq - 1, TMP_BUF_SIZE - 1)] = '\0';
-    strncpy(value, argv[i] + eq, min(strlen(argv[i]) - eq, TMP_BUF_SIZE - 1));
-    value[min(strlen(argv[i]) - eq, TMP_BUF_SIZE - 1)] = '\0';
+    strncpy(name, argv[i], fmin(eq - 1, TMP_BUF_SIZE - 1));
+    name[(int)fmin(eq - 1, TMP_BUF_SIZE - 1)] = '\0';
+    strncpy(value, argv[i] + eq, (int)fmin(strlen(argv[i]) - eq, TMP_BUF_SIZE - 1));
+    value[(int)fmin(strlen(argv[i]) - eq, TMP_BUF_SIZE - 1)] = '\0';
     found = 0;
     for(j = 0; j < OPT_COUNT; j++)
       if(!strcmp(vars[j].varname, name)) {

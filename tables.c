@@ -5,13 +5,14 @@
 **
 */
 
-
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
+#include <cmath>
 #include "cover.h"
 #include "bincoef.h"
 #include "setoper.h"
 #include "tables.h"
-
+#include <algorithm>
 
 rankType *kset = NULL; //this is the solution
 int neighborLen, coverLen, coveredLen;
@@ -50,7 +51,7 @@ void allocateMemory(void)
     coverError(INVALID_PARAMETERS);
 
   tmp = coverLen = 0;
-  for(i = 0; i <= min(k - t, m - t); i++) {
+  for(i = 0; i <= fmin(k - t, m - t); i++) {
     if(overflowBinCoef(k, t + i) || overflowBinCoef(v - k, m - t - i))
       coverError(BINCOEF_OVERFLOW);
     coverLen += binCoef[k][t + i] * binCoef[v - k][m - t - i];
@@ -205,7 +206,7 @@ void calculateOneCovering(rankType kRank, rankType *buf)
   unrankSubset(kRank, subset, k);                 //subset is curr block
   subset[k] = maxv + 1; /* sentinel */
   makeComplement(subset, csubset, v);             //csubset is points not in curr block
-  for(ti = t; ti <= min(k, m); ti++) {
+  for(ti = t; ti <= fmin(k, m); ti++) {
     getFirstSubset(subsubset, ti);                //t-set that this block covers
     do {
       getFirstSubset(subcsubset, m - ti);         //other points not in block we can add to t-set to make m-set
@@ -230,7 +231,7 @@ void calculateOneCovering(rankType kRank, rankType *buf)
     } while(getNextSubset(subsubset, ti, k));
   }
   *coverptr = binCoef[v][m]; /* sentinel */
-  qsort((char *) buf, coverLen - 1, sizeof(rankType), compareRanks);
+  std::sort(buf, kset+coverLen - 1);
 }
 
 
@@ -316,5 +317,5 @@ void bIs(int bl)
 
 void sortSolution(void)
 {
-  qsort(kset, b, sizeof(rankType), compareRanks);
+  std::sort(kset, kset+b);
 }

@@ -2,11 +2,11 @@
 # Makefile for program "cover" by Kari J. Nurmela.
 #
 
-CC = gcc
+CXX = g++
 LIBS= -lm
 
-FLAGS= -ggdb -W # unoptimized, debuggable
-#FLAGS= -W -O2 # optimized, not debuggable
+#FLAGS= -ggdb -W # unoptimized, debuggable
+FLAGS= -ffast-math  -W -Ofast -D_GLIBCXX_PARALLEL# optimized, not debuggable
 
 #if windows
 #REMOVE= del cover.exe
@@ -20,12 +20,12 @@ OBJECTS= cover.o bincoef.o tables.o setoper.o solcheck.o exp.o arg.o pdo.o
 CS=      cover.c bincoef.c tables.c setoper.c solcheck.c exp.c arg.c pdo.c
 AUTOBACKUPS= *~
 
-.cc.o :
-	$(CC) $(FLAGS) -c $<
+.c.o :	$(CS)
+	$(CXX) $(FLAGS) -c $<
 
 cover:	$(OBJECTS)
 	$(REMOVE)
-	$(CC) -o cover $(OBJECTS) \
+	$(CXX) $(FLAGS) -lgomp -o cover $(OBJECTS) \
 	$(LIBS)
 
 distrib:
@@ -35,7 +35,7 @@ distrib:
 	echo "NOTE: distribution contains files cover.tar.Z, cover.zip, and README."
 
 clean:
-	$(DELETE) $(OBJECTS)
+	$(DELETE) $(OBJECTS) $(BCS) cover
 	$(DELETE) $(AUTOBACKUPS)
 	$(DELETE) core
 	$(DELETE) cover.tar

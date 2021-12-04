@@ -11,14 +11,14 @@
 
 #include <stdio.h>
 #include <limits.h>
-
+#include <cstdlib>
 //#define maxv 40
 #define maxv 70
 /* binomial coefficients are tried to calculate up to binCoef[maxv][?]
  * (overflow is checked and the program is not halted
  */
 
-#define min(X,Y) ((X) < (Y) ? (X) : (Y))
+//#define min(X,Y) ((X) < (Y) ? (X) : (Y))
 
 
 /* initialize random number generator */

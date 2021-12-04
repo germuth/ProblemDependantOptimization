@@ -26,6 +26,9 @@
 #include "cover.h"
 #include "bincoef.h"
 #include "tables.h"
+#include "setoper.h"
+#include "solcheck.h"
+#include "arg.h"
 #include "exp.h"
 #include "pdo.h"
 
@@ -153,6 +156,65 @@ int compareVarieties(varietyType *a, varietyType *b) {
 char *logName, *resultName;
 FILE *logFp, *resFp;
 
+void printProblemParams(){
+    if(pack){
+        printf("Searching for a (%d,%d,%d,%d,%d) packing in %d blocks. (v,k,m,t,lambda)\n\n",
+        v,k,m,t,coverNumber,b);
+    }else{
+        printf("Searching for a (%d,%d,%d,%d,%d) covering in %d blocks. (v,k,m,t,lambda)\n\n",
+        v,k,m,t,coverNumber,b);
+    }
+    if(pack){
+        asprintf(&logName, "./solutions/P(%d,%d,%d,%d,%d) - %d.log", v,k,m,t,coverNumber,b);
+    }else{
+        asprintf(&logName, "./solutions/C(%d,%d,%d,%d,%d) - %d.log", v,k,m,t,coverNumber,b);
+    }
+    logFp = fopen(logName, "w");
+    if(!logFp) {
+        fprintf(stderr, "Can't open log file %s.\n", logName);
+        coverError(SEE_ABOVE_ERROR);
+    }
+    if(verbose && !pdoFlag){
+        printParams(stdout);
+    }
+    printParams(logFp);
+}
+
+void printProblemOutput(){
+    if(verbose){
+        printf("Result:\n" "-------\n"
+        "EndLimit      = %d\n\n", endLimit);
+    }
+    if(verbose){
+        if(finalCost <= endLimit) {
+            printf("Solution:\n" "---------\n");
+        } else {
+            printf("EndLimit was not reached.\n\n");
+            if(verbose >= 2) {
+                printf("Inadequate solution:\n" "--------------------\n");
+                printSolution(stdout);
+            }
+        }
+    }
+    if(finalCost <= endLimit) {
+        if(verbose) {
+            printSolution(stdout);
+        }
+        if(pack){
+            asprintf(&resultName, "./solutions/P(%d,%d,%d,%d,%d) - %d.res", v,k,m,t,coverNumber,b);
+        }else{
+            asprintf(&resultName, "./solutions/C(%d,%d,%d,%d,%d) - %d.res", v,k,m,t,coverNumber,b);
+        }
+        resFp = fopen(resultName, "w");
+        if(!resFp) {
+            fprintf(stderr, "Can't open file %s.\n", resultName);
+            coverError(SEE_ABOVE_ERROR);
+        }
+        printSolution(resFp);
+        fclose(resFp);
+    }
+}
+
 int main(int argc, char **argv) {
     costType retVal;
     int j, i, count, bcounter;
@@ -227,61 +289,3 @@ int main(int argc, char **argv) {
     return !solFound; /* returns 0 if a solution was found */
 }
 
-void printProblemParams(){
-    if(pack){
-        printf("Searching for a (%d,%d,%d,%d,%d) packing in %d blocks. (v,k,m,t,lambda)\n\n",
-        v,k,m,t,coverNumber,b);
-    }else{
-        printf("Searching for a (%d,%d,%d,%d,%d) covering in %d blocks. (v,k,m,t,lambda)\n\n",
-        v,k,m,t,coverNumber,b);
-    }
-    if(pack){
-        asprintf(&logName, "./solutions/P(%d,%d,%d,%d,%d) - %d.log", v,k,m,t,coverNumber,b);
-    }else{
-        asprintf(&logName, "./solutions/C(%d,%d,%d,%d,%d) - %d.log", v,k,m,t,coverNumber,b);
-    }
-    logFp = fopen(logName, "w");
-    if(!logFp) {
-        fprintf(stderr, "Can't open log file %s.\n", logName);
-        coverError(SEE_ABOVE_ERROR);
-    }
-    if(verbose && !pdoFlag){
-        printParams(stdout);
-    }
-    printParams(logFp);
-}
-
-void printProblemOutput(){
-    if(verbose){
-        printf("Result:\n" "-------\n"
-        "EndLimit      = %d\n\n", endLimit);
-    }
-    if(verbose){
-        if(finalCost <= endLimit) {
-            printf("Solution:\n" "---------\n");
-        } else {
-            printf("EndLimit was not reached.\n\n");
-            if(verbose >= 2) {
-                printf("Inadequate solution:\n" "--------------------\n");
-                printSolution(stdout);
-            }
-        }
-    }
-    if(finalCost <= endLimit) {
-        if(verbose) {
-            printSolution(stdout);
-        }
-        if(pack){
-            asprintf(&resultName, "./solutions/P(%d,%d,%d,%d,%d) - %d.res", v,k,m,t,coverNumber,b);
-        }else{
-            asprintf(&resultName, "./solutions/C(%d,%d,%d,%d,%d) - %d.res", v,k,m,t,coverNumber,b);
-        }
-        resFp = fopen(resultName, "w");
-        if(!resFp) {
-            fprintf(stderr, "Can't open file %s.\n", resultName);
-            coverError(SEE_ABOVE_ERROR);
-        }
-        printSolution(resFp);
-        fclose(resFp);
-    }
-}
